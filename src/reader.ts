@@ -5,21 +5,27 @@ import { AbiItem } from 'web3-utils/types'
 
 const abi:AbiItem[] = require('../fixtures/BasicToken.json')
 
-const _web3:IWeb3 = getWeb3('http://127.0.0.1:8545')
+export type StatsAboutTheToken = {
+  totalSupply: string
+}
 
-getAllTheStats(_web3)
-  .catch(e => console.error(e))
-  .finally(() => stopWeb3(_web3))
+if (!module.parent) {
+  const _web3:IWeb3 = getWeb3('http://127.0.0.1:8545')
+
+  getAllTheStats(_web3)
+    .catch(e => console.error(e))
+    .finally(() => stopWeb3(_web3))
+}
 
 // functions
 
-async function getAllTheStats(web3:IWeb3) {
+export async function getAllTheStats(web3:IWeb3):Promise<StatsAboutTheToken> {
   console.log(`Using remote Ethereum node at ${web3.currentProvider.host}`)
   console.log("Connected peers:", await web3.eth.net.getPeerCount())
   console.log()
 
-  const lookupBalanceOfThisAddress = '0x1a2a3be22af2f6828ad767918b847f5cab4965b4'
-  const deployedToken = '0x5f46941467Fc91d553138B41584fFc10ba72BF34'
+  const lookupBalanceOfThisAddress = '0x7B617e97ed4EC657058e7b4a5985110B5195Dc9A'
+  const deployedToken = '0xf93468d7F8C59c9514fC8053AD4a8268D62993e7'
 
   const basicToken:ContractInstance = new web3.eth.Contract(abi,deployedToken)
 
@@ -35,6 +41,8 @@ async function getAllTheStats(web3:IWeb3) {
   console.log(`basicToken.methods.balanceOf(${lookupBalanceOfThisAddress})`)
   console.log('  ' + balance)
 
-  // throw {message:'lol'}
+  return <StatsAboutTheToken>{
+    totalSupply: totalSupply.toString()
+  }
 }
 
